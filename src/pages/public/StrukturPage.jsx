@@ -1,6 +1,6 @@
 import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
-import { STRUCTURE } from '../../data/portalData'
+import { STRUCTURE } from '../../mocks/portalData'
 
 const LEADER_COLORS = {
   Ketua: { bg: '#1a3a6b', light: '#eff6ff' },

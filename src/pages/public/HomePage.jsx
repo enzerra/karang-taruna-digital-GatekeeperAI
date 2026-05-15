@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
-import { PROGRAMS } from '../../data/portalData'
-import { listNews } from '../../data/newsService'
+import { PROGRAMS } from '../../mocks/portalData'
+import { listNews } from '../../services/news/newsService'
 
 export default function HomePage({ navigate }) {
   const [news, setNews] = useState([])

@@ -1,4 +1,5 @@
-import { USERS } from './portalData'
+import { USERS } from '../../mocks/portalData'
+import { readStorage, writeStorage } from '../../lib/storage'
 
 const STORAGE_KEY = 'karang-taruna-users-v1'
 
@@ -22,7 +23,7 @@ function normalizeUser(item, idx = 0) {
 
 function safeParse(raw) {
   try {
-    const parsed = JSON.parse(raw)
+    const parsed = raw
     if (!Array.isArray(parsed)) return null
     return parsed.map((item, idx) => normalizeUser(item, idx))
   } catch {
@@ -34,19 +35,16 @@ export function getUsers() {
   if (typeof window === 'undefined') {
     return USERS.map((item, idx) => normalizeUser(item, idx))
   }
-  const saved = safeParse(window.localStorage.getItem(STORAGE_KEY))
+  const saved = safeParse(readStorage(STORAGE_KEY))
   if (saved && saved.length) return saved
   const seeded = USERS.map((item, idx) => normalizeUser(item, idx))
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(seeded))
+  writeStorage(STORAGE_KEY, seeded)
   return seeded
 }
 
 export function saveUsers(users) {
   if (typeof window === 'undefined') return
-  window.localStorage.setItem(
-    STORAGE_KEY,
-    JSON.stringify(users.map((item, idx) => normalizeUser(item, idx)))
-  )
+  writeStorage(STORAGE_KEY, users.map((item, idx) => normalizeUser(item, idx)))
 }
 
 export function getRoleStyle(role) {

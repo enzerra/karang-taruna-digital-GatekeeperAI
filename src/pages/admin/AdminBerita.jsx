@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import AdminGovernanceLayout from '../../components/AdminGovernanceLayout'
-import { FALLBACK_IMAGE, NEWS_CATEGORIES, NEWS_STATUS } from '../../data/newsStore'
-import { createNews, listNews, removeNews, updateNews } from '../../data/newsService'
+import { FALLBACK_IMAGE, NEWS_CATEGORIES, NEWS_STATUS } from '../../services/news/newsStore'
+import { createNews, listNews, removeNews, updateNews } from '../../services/news/newsService'
 
 const EMPTY_FORM = {
   title: '',
@@ -128,7 +128,7 @@ export default function AdminBerita({ navigate }) {
     const selected = news.find((item) => item.id === id)
     if (!selected) return
 
-    const approved = window.confirm(`Hapus berita \"${selected.title}\"?`)
+    const approved = window.confirm(`Hapus berita "${selected.title}"?`)
     if (!approved) return
 
     try {

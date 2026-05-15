@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
-import { listNews } from '../../data/newsService'
+import { listNews } from '../../services/news/newsService'
 
 export default function BeritaDetailPage({ navigate, item }) {
   const [article, setArticle] = useState(item ?? null)

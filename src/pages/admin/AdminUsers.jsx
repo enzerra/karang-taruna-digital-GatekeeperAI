@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import AdminGovernanceLayout from '../../components/AdminGovernanceLayout'
-import { getRoleStyle, USER_ROLES, USER_STATUS } from '../../data/userStore'
-import { createUser, listUsers, removeUser, updateUser } from '../../data/userService'
+import { getRoleStyle, USER_ROLES, USER_STATUS } from '../../services/users/userStore'
+import { createUser, listUsers, removeUser, updateUser } from '../../services/users/userService'
 
 const EMPTY_FORM = {
   name: '',
@@ -125,7 +125,7 @@ export default function AdminUsers({ navigate }) {
     const selected = users.find((item) => item.id === id)
     if (!selected) return
 
-    const approved = window.confirm(`Hapus pengguna \"${selected.name}\"?`)
+    const approved = window.confirm(`Hapus pengguna "${selected.name}"?`)
     if (!approved) return
 
     try {

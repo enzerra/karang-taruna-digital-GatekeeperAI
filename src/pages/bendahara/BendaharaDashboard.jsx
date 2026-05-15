@@ -7,7 +7,7 @@ import {
   removeCategory,
   removeTransaction,
   updateTransaction,
-} from '../../data/financeService'
+} from '../../services/finance/financeService'
 import BendaharaKategori from './BendaharaKategori'
 import BendaharaLaporan from './BendaharaLaporan'
 import BendaharaOverview from './BendaharaOverview'

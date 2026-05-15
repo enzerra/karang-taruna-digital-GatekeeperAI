@@ -1,4 +1,5 @@
-import { NEWS } from './portalData'
+import { NEWS } from '../../mocks/portalData'
+import { readStorage, writeStorage } from '../../lib/storage'
 
 const STORAGE_KEY = 'karang-taruna-news-v1'
 const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=900&q=80'
@@ -28,7 +29,7 @@ function normalizeNews(item, idx = 0) {
 
 function safeParse(raw) {
   try {
-    const parsed = JSON.parse(raw)
+    const parsed = raw
     if (!Array.isArray(parsed)) return null
     return parsed.map((item, idx) => normalizeNews(item, idx))
   } catch {
@@ -40,19 +41,16 @@ export function getNews() {
   if (typeof window === 'undefined') {
     return NEWS.map((item, idx) => normalizeNews(item, idx))
   }
-  const saved = safeParse(window.localStorage.getItem(STORAGE_KEY))
+  const saved = safeParse(readStorage(STORAGE_KEY))
   if (saved && saved.length) return saved
   const seeded = NEWS.map((item, idx) => normalizeNews(item, idx))
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(seeded))
+  writeStorage(STORAGE_KEY, seeded)
   return seeded
 }
 
 export function saveNews(news) {
   if (typeof window === 'undefined') return
-  window.localStorage.setItem(
-    STORAGE_KEY,
-    JSON.stringify(news.map((item, idx) => normalizeNews(item, idx)))
-  )
+  writeStorage(STORAGE_KEY, news.map((item, idx) => normalizeNews(item, idx)))
 }
 
 export function getNewsCategoryColor(category) {

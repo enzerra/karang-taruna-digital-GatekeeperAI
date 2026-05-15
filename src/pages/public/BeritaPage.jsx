@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
-import { NEWS_CATEGORIES } from '../../data/newsStore'
-import { listNews } from '../../data/newsService'
+import { NEWS_CATEGORIES } from '../../services/news/newsStore'
+import { listNews } from '../../services/news/newsService'
 
 const CATS = ['Semua', ...NEWS_CATEGORIES]
 

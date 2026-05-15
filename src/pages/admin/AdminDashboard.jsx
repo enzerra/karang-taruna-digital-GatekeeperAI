@@ -5,15 +5,15 @@ import {
   getStatusStyle,
   PROGRAM_CATEGORIES,
   PROGRAM_STATUS,
-} from '../../data/programStore'
+} from '../../services/programs/programStore'
 import {
   createProgram,
   listPrograms,
   removeProgram,
   updateProgram,
-} from '../../data/programService'
-import { listNews, removeNews } from '../../data/newsService'
-import { TRANSACTIONS } from '../../data/portalData'
+} from '../../services/programs/programService'
+import { listNews, removeNews } from '../../services/news/newsService'
+import { TRANSACTIONS } from '../../mocks/portalData'
 
 const EMPTY_FORM = {
   title: '',
@@ -156,7 +156,7 @@ export default function AdminDashboard({ navigate }) {
   async function handleDeleteProgram(id) {
     const selected = programs.find((item) => item.id === id)
     if (!selected) return
-    const approved = window.confirm(`Hapus program \"${selected.title}\"?`)
+    const approved = window.confirm(`Hapus program "${selected.title}"?`)
     if (!approved) return
 
     await removeProgram(id)
@@ -167,7 +167,7 @@ export default function AdminDashboard({ navigate }) {
   async function handleDeleteNews(id) {
     const selected = news.find((item) => item.id === id)
     if (!selected) return
-    const approved = window.confirm(`Hapus berita \"${selected.title}\"?`)
+    const approved = window.confirm(`Hapus berita "${selected.title}"?`)
     if (!approved) return
 
     await removeNews(id)

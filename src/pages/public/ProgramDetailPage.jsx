@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
-import { getStatusStyle } from '../../data/programStore'
-import { findProgramById, listPrograms } from '../../data/programService'
+import { getStatusStyle } from '../../services/programs/programStore'
+import { findProgramById, listPrograms } from '../../services/programs/programService'
 
 export default function ProgramDetailPage({ navigate, item }) {
   const [program, setProgram] = useState(null)

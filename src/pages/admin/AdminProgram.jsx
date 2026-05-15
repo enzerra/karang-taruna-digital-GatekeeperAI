@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import AdminGovernanceLayout from '../../components/AdminGovernanceLayout'
-import { FALLBACK_IMAGE, getStatusStyle, PROGRAM_CATEGORIES, PROGRAM_STATUS } from '../../data/programStore'
-import { createProgram, listPrograms, removeProgram, updateProgram } from '../../data/programService'
+import { FALLBACK_IMAGE, getStatusStyle, PROGRAM_CATEGORIES, PROGRAM_STATUS } from '../../services/programs/programStore'
+import { createProgram, listPrograms, removeProgram, updateProgram } from '../../services/programs/programService'
 
 const EMPTY_FORM = {
   title: '',
@@ -123,7 +123,7 @@ export default function AdminProgram({ navigate }) {
   async function handleDelete(id) {
     const selected = programs.find((item) => item.id === id)
     if (!selected) return
-    const approved = window.confirm(`Hapus program \"${selected.title}\"?`)
+    const approved = window.confirm(`Hapus program "${selected.title}"?`)
     if (!approved) return
 
     try {

@@ -1,4 +1,5 @@
-import { TRANSACTIONS } from './portalData'
+import { TRANSACTIONS } from '../../mocks/portalData'
+import { readStorage, writeStorage } from '../../lib/storage'
 
 const TX_KEY = 'karang-taruna-finance-transactions-v1'
 const CAT_KEY = 'karang-taruna-finance-categories-v1'
@@ -25,7 +26,7 @@ function normalizeTransaction(item, idx = 0) {
 
 function safeParse(raw) {
   try {
-    const parsed = JSON.parse(raw)
+    const parsed = raw
     return parsed
   } catch {
     return null
@@ -36,28 +37,28 @@ export function getTransactions() {
   if (typeof window === 'undefined') {
     return TRANSACTIONS.map((item, idx) => normalizeTransaction(item, idx))
   }
-  const saved = safeParse(window.localStorage.getItem(TX_KEY))
+  const saved = safeParse(readStorage(TX_KEY))
   if (Array.isArray(saved) && saved.length) return saved.map((item, idx) => normalizeTransaction(item, idx))
   const seeded = TRANSACTIONS.map((item, idx) => normalizeTransaction(item, idx))
-  window.localStorage.setItem(TX_KEY, JSON.stringify(seeded))
+  writeStorage(TX_KEY, seeded)
   return seeded
 }
 
 export function saveTransactions(transactions) {
   if (typeof window === 'undefined') return
-  window.localStorage.setItem(TX_KEY, JSON.stringify(transactions.map((item, idx) => normalizeTransaction(item, idx))))
+  writeStorage(TX_KEY, transactions.map((item, idx) => normalizeTransaction(item, idx)))
 }
 
 export function getCategories() {
   if (typeof window === 'undefined') return DEFAULT_CATEGORIES
-  const saved = safeParse(window.localStorage.getItem(CAT_KEY))
+  const saved = safeParse(readStorage(CAT_KEY))
   if (saved && typeof saved === 'object') {
     return {
       pemasukan: Array.isArray(saved.pemasukan) ? saved.pemasukan : DEFAULT_CATEGORIES.pemasukan,
       pengeluaran: Array.isArray(saved.pengeluaran) ? saved.pengeluaran : DEFAULT_CATEGORIES.pengeluaran,
     }
   }
-  window.localStorage.setItem(CAT_KEY, JSON.stringify(DEFAULT_CATEGORIES))
+  writeStorage(CAT_KEY, DEFAULT_CATEGORIES)
   return DEFAULT_CATEGORIES
 }
 
@@ -67,6 +68,6 @@ export function saveCategories(categories) {
     pemasukan: Array.isArray(categories?.pemasukan) ? categories.pemasukan : DEFAULT_CATEGORIES.pemasukan,
     pengeluaran: Array.isArray(categories?.pengeluaran) ? categories.pengeluaran : DEFAULT_CATEGORIES.pengeluaran,
   }
-  window.localStorage.setItem(CAT_KEY, JSON.stringify(next))
+  writeStorage(CAT_KEY, next)
 }
 

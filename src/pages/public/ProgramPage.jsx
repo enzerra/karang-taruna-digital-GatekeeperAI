@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import Navbar from '../../components/Navbar'
-import { getCategoryColor, getStatusStyle } from '../../data/programStore'
-import { listPrograms } from '../../data/programService'
+import { getCategoryColor, getStatusStyle } from '../../services/programs/programStore'
+import { listPrograms } from '../../services/programs/programService'
 
 const FILTERS = ['Semua', 'AKTIF', 'SELESAI', 'MENDATANG']
 

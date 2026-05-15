@@ -1,4 +1,5 @@
-import { PROGRAMS } from './portalData'
+import { PROGRAMS } from '../../mocks/portalData'
+import { readStorage, writeStorage } from '../../lib/storage'
 
 const STORAGE_KEY = 'karang-taruna-programs-v1'
 
@@ -37,7 +38,7 @@ function normalizeProgram(item, idx = 0) {
 
 function safeParse(raw) {
   try {
-    const parsed = JSON.parse(raw)
+    const parsed = raw
     if (!Array.isArray(parsed)) return null
     return parsed.map((item, idx) => normalizeProgram(item, idx))
   } catch {
@@ -49,19 +50,16 @@ export function getPrograms() {
   if (typeof window === 'undefined') {
     return PROGRAMS.map((item, idx) => normalizeProgram(item, idx))
   }
-  const saved = safeParse(window.localStorage.getItem(STORAGE_KEY))
+  const saved = safeParse(readStorage(STORAGE_KEY))
   if (saved && saved.length) return saved
   const seeded = PROGRAMS.map((item, idx) => normalizeProgram(item, idx))
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(seeded))
+  writeStorage(STORAGE_KEY, seeded)
   return seeded
 }
 
 export function savePrograms(programs) {
   if (typeof window === 'undefined') return
-  window.localStorage.setItem(
-    STORAGE_KEY,
-    JSON.stringify(programs.map((item, idx) => normalizeProgram(item, idx)))
-  )
+  writeStorage(STORAGE_KEY, programs.map((item, idx) => normalizeProgram(item, idx)))
 }
 
 export function getStatusStyle(status) {
