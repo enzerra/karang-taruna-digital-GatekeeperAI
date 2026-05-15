@@ -1,8 +1,25 @@
+import { useEffect, useState } from 'react'
 import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
-import { NEWS, PROGRAMS } from '../../data/portalData'
+import { PROGRAMS } from '../../data/portalData'
+import { listNews } from '../../data/newsService'
 
 export default function HomePage({ navigate }) {
+  const [news, setNews] = useState([])
+  const BADGE_STYLE = {
+    AKTIF: { bg: '#dcfce7', color: '#166534' },
+    MENDATANG: { bg: '#fef3c7', color: '#92400e' },
+    SELESAI: { bg: '#e5e7eb', color: '#374151' },
+  }
+
+  useEffect(() => {
+    const load = async () => {
+      const data = await listNews()
+      setNews(data)
+    }
+    load()
+  }, [])
+
   return (
     <div className="min-h-screen bg-white">
       <Navbar navigate={navigate} activePage="home" />
@@ -79,7 +96,7 @@ export default function HomePage({ navigate }) {
             </button>
           </div>
           <div className="grid md:grid-cols-3 gap-6">
-            {NEWS.slice(0, 3).map(item => (
+            {news.slice(0, 3).map(item => (
               <article key={item.id} onClick={() => navigate('berita-detail', item)}
                 className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all hover:-translate-y-1 group cursor-pointer">
                 <div className="overflow-hidden h-48">
@@ -109,12 +126,17 @@ export default function HomePage({ navigate }) {
           </div>
           <div className="grid md:grid-cols-3 gap-5">
             {PROGRAMS.slice(0, 6).map(prog => (
-              <div key={prog.id} style={{ background: prog.bg }} className="rounded-2xl p-5 hover:shadow-md transition-all hover:-translate-y-0.5">
+              <div key={prog.id} className="rounded-2xl p-5 bg-white border border-gray-100 hover:shadow-md transition-all hover:-translate-y-0.5">
                 <div className="flex items-start justify-between mb-3">
-                  <div className="w-11 h-11 rounded-xl overflow-hidden" style={{ background: prog.iconBg }}>
+                  <div className="w-11 h-11 rounded-xl overflow-hidden bg-gray-100">
                     <img src={prog.img} alt={prog.title} className="w-full h-full object-cover" />
                   </div>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: prog.badgeBg, color: prog.badgeColor }}>{prog.badge}</span>
+                  <span
+                    className="text-[10px] font-bold px-2 py-0.5 rounded-full"
+                    style={BADGE_STYLE[prog.badge] ?? { bg: '#e5e7eb', color: '#374151' }}
+                  >
+                    {prog.badge}
+                  </span>
                 </div>
                 <h3 className="font-bold text-gray-900 mb-2 text-sm">{prog.title}</h3>
                 <p className="text-gray-500 text-xs leading-relaxed">{prog.desc}</p>
