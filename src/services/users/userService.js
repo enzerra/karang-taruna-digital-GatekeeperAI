@@ -1,4 +1,6 @@
 import { getUsers, saveUsers } from './userStore'
+import { USE_BACKEND_API } from '../../config/api'
+import { requestJson } from '../../lib/apiClient'
 
 function sanitizeUserPayload(payload = {}) {
   return {
@@ -11,15 +13,20 @@ function sanitizeUserPayload(payload = {}) {
 }
 
 export async function listUsers() {
+  if (USE_BACKEND_API) return requestJson('/api/users')
   return getUsers()
 }
 
 export async function findUserById(id) {
+  if (USE_BACKEND_API) return requestJson(`/api/users/${Number(id)}`)
   const users = getUsers()
   return users.find((item) => item.id === Number(id)) ?? null
 }
 
 export async function createUser(payload) {
+  if (USE_BACKEND_API) {
+    return requestJson('/api/users', { method: 'POST', body: JSON.stringify(payload) })
+  }
   const users = getUsers()
   const nextUser = {
     id: Date.now(),
@@ -31,6 +38,9 @@ export async function createUser(payload) {
 }
 
 export async function updateUser(id, payload) {
+  if (USE_BACKEND_API) {
+    return requestJson(`/api/users/${Number(id)}`, { method: 'PUT', body: JSON.stringify(payload) })
+  }
   const targetId = Number(id)
   const users = getUsers()
   const nextUsers = users.map((item) => {
@@ -42,6 +52,10 @@ export async function updateUser(id, payload) {
 }
 
 export async function removeUser(id) {
+  if (USE_BACKEND_API) {
+    await requestJson(`/api/users/${Number(id)}`, { method: 'DELETE' })
+    return true
+  }
   const targetId = Number(id)
   const users = getUsers()
   const nextUsers = users.filter((item) => item.id !== targetId)

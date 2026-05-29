@@ -1,0 +1,22 @@
+{
+  "name": "digitalisasi-karang-taruna-api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "RESTful API (Express.js) untuk portal Digitalisasi Karang Taruna. Penyimpanan sementara memakai file JSON sebelum migrasi ke database.",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js"
+  },
+  "engines": {
+    "node": ">=18.17"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "morgan": "^1.10.0",
+    "pg": "^8.13.1"
+  }
+}

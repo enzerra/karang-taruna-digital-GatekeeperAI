@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { login } from '../../services/auth/authService'
 
 const roles = [
   {
@@ -31,13 +32,29 @@ export default function LoginPage({ navigate }) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPass, setShowPass] = useState(false)
+  const [error, setError] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
 
   const selectedRole = roles.find(item => item.value === role)
 
-  function handleLogin(e) {
+  function destinationFor(userRole) {
+    if (userRole === 'bendahara') return 'bendahara'
+    if (userRole === 'anggota') return 'home'
+    return 'admin-dashboard'
+  }
+
+  async function handleLogin(e) {
     e.preventDefault()
-    if (role === 'admin') navigate('admin-dashboard')
-    else navigate('bendahara')
+    setError('')
+    setIsLoading(true)
+    try {
+      const { user } = await login({ email, password, role })
+      navigate(destinationFor(user?.role || role))
+    } catch (err) {
+      setError(err.message || 'Gagal masuk. Periksa email dan password Anda.')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -212,14 +229,23 @@ export default function LoginPage({ navigate }) {
                   <a href="#" className="font-bold text-[#1a3a6b] hover:text-[#152f58]">Lupa password?</a>
                 </div>
 
+                {error && (
+                  <p className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-600">
+                    {error}
+                  </p>
+                )}
+
                 <button
                   type="submit"
-                  className="group mt-2 flex h-[52px] w-full items-center justify-center gap-2 rounded-2xl bg-[#1a3a6b] px-5 py-3 text-sm font-black text-white shadow-[0_16px_32px_rgba(26,58,107,0.22)] transition hover:-translate-y-0.5 hover:bg-[#152f58] focus:outline-none focus:ring-4 focus:ring-[#1a3a6b]/20"
+                  disabled={isLoading}
+                  className="group mt-2 flex h-[52px] w-full items-center justify-center gap-2 rounded-2xl bg-[#1a3a6b] px-5 py-3 text-sm font-black text-white shadow-[0_16px_32px_rgba(26,58,107,0.22)] transition hover:-translate-y-0.5 hover:bg-[#152f58] focus:outline-none focus:ring-4 focus:ring-[#1a3a6b]/20 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
                 >
-                  Masuk sebagai {selectedRole.label}
-                  <svg className="h-4 w-4 transition group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14m-6-6 6 6-6 6" />
-                  </svg>
+                  {isLoading ? 'Memproses...' : `Masuk sebagai ${selectedRole.label}`}
+                  {!isLoading && (
+                    <svg className="h-4 w-4 transition group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14m-6-6 6 6-6 6" />
+                    </svg>
+                  )}
                 </button>
               </form>
 

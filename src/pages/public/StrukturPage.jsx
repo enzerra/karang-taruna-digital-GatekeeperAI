@@ -1,6 +1,8 @@
+import { useEffect, useState } from 'react'
 import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
 import { STRUCTURE } from '../../mocks/portalData'
+import { getStructure } from '../../services/structure/structureService'
 
 const LEADER_COLORS = {
   Ketua: { bg: '#1a3a6b', light: '#eff6ff' },
@@ -27,6 +29,20 @@ function LeaderCard({ member }) {
 }
 
 export default function StrukturPage({ navigate }) {
+  const [structure, setStructure] = useState(STRUCTURE)
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const data = await getStructure()
+        if (data) setStructure(data)
+      } catch {
+        setStructure(STRUCTURE)
+      }
+    }
+    load()
+  }, [])
+
   return (
     <div className="min-h-screen bg-white">
       <Navbar navigate={navigate} activePage="struktur" />
@@ -41,25 +57,25 @@ export default function StrukturPage({ navigate }) {
 
           {/* Ketua - center */}
           <div className="max-w-xs mx-auto mb-6">
-            <LeaderCard member={STRUCTURE.ketua} />
+            <LeaderCard member={structure.ketua} />
           </div>
 
           {/* Wakil */}
           <div className="max-w-xs mx-auto mb-6">
-            <LeaderCard member={STRUCTURE.wakil} />
+            <LeaderCard member={structure.wakil} />
           </div>
 
           {/* Sekretaris & Bendahara */}
           <div className="grid md:grid-cols-2 gap-5 max-w-2xl mx-auto mb-10">
-            <LeaderCard member={STRUCTURE.sekretaris} />
-            <LeaderCard member={STRUCTURE.bendahara} />
+            <LeaderCard member={structure.sekretaris} />
+            <LeaderCard member={structure.bendahara} />
           </div>
 
           {/* Anggota */}
           <div className="bg-gray-50 rounded-2xl p-6">
             <h3 className="font-bold text-gray-900 mb-5 text-center">Anggota Inti</h3>
             <div className="grid md:grid-cols-3 gap-4">
-              {STRUCTURE.anggota.map(m => (
+              {structure.anggota.map(m => (
                 <div key={m.name} className="bg-white rounded-xl p-4 flex items-center gap-3 border border-gray-100 hover:border-blue-200 hover:shadow-sm transition-all">
                   <div className="w-10 h-10 rounded-xl bg-[#1a3a6b] flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
                     {m.name.charAt(0)}

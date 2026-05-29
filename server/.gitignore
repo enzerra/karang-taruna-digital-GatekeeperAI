@@ -1,0 +1,6 @@
+node_modules
+.env
+.env.local
+
+# File data lokal yang dibuat saat runtime (di-seed dari src/seed.js)
+data/db.json
