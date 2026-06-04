@@ -21,6 +21,7 @@ import { monthLabel, parseMonthKey } from './bendaharaUtils'
 import BendaharaHeader from './components/BendaharaHeader'
 import BendaharaSidebar from './components/BendaharaSidebar'
 import TransactionModal from './components/TransactionModal'
+import ReceiptPreviewModal from './components/ReceiptPreviewModal'
 
 export default function BendaharaDashboard({ navigate }) {
   const [active, setActive] = useState('dashboard')
@@ -35,6 +36,7 @@ export default function BendaharaDashboard({ navigate }) {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingId, setEditingId] = useState(null)
   const [form, setForm] = useState(EMPTY_TX)
+  const [previewTx, setPreviewTx] = useState(null)
   const [infoMessage, setInfoMessage] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
   const [isSaving, setIsSaving] = useState(false)
@@ -49,7 +51,14 @@ export default function BendaharaDashboard({ navigate }) {
       setCats(catData)
       setIsLoading(false)
     }
+
+    const handleRefresh = () => {
+      load()
+    }
+
     load()
+    window.addEventListener('karang-taruna:finance-updated', handleRefresh)
+    return () => window.removeEventListener('karang-taruna:finance-updated', handleRefresh)
   }, [])
 
   const derived = useMemo(() => {
@@ -68,8 +77,21 @@ export default function BendaharaDashboard({ navigate }) {
     const months = Object.keys(byMonth).sort().slice(-6)
     const chart = months.map((key) => ({ key, label: monthLabel(key), ...byMonth[key] }))
 
+    const lastM = chart[chart.length - 1] || { income: 0, expense: 0 }
+    const prevM = chart[chart.length - 2] || { income: 0, expense: 0 }
+    const calcDelta = (curr, prev) => {
+      if (prev === 0) return curr > 0 ? 100 : 0
+      return ((curr - prev) / prev) * 100
+    }
+
+    const kpi = {
+      income: { value: lastM.income, delta: calcDelta(lastM.income, prevM.income) },
+      expense: { value: lastM.expense, delta: calcDelta(lastM.expense, prevM.expense) },
+      saldo: { value: saldo, delta: calcDelta(lastM.income - lastM.expense, prevM.income - prevM.expense) }
+    }
+
     const latest = [...tx].sort((a, b) => String(b.date).localeCompare(String(a.date))).slice(0, 6)
-    return { totalIn, totalOut, saldo, chart, latest }
+    return { totalIn, totalOut, saldo, chart, latest, kpi }
   }, [tx])
 
   const filteredTx = useMemo(() => {
@@ -234,6 +256,10 @@ export default function BendaharaDashboard({ navigate }) {
     setCats(next)
   }
 
+  function openPreview(item) {
+    setPreviewTx(item)
+  }
+
   const transactionProps = {
     filterType,
     setFilterType,
@@ -248,11 +274,12 @@ export default function BendaharaDashboard({ navigate }) {
     openCreate,
     openEdit,
     deleteTx,
+    openPreview,
   }
 
   function renderContent() {
     if (active === 'dashboard') {
-      return <BendaharaOverview derived={derived} dashboardInsight={dashboardInsight} setActive={setActive} />
+      return <BendaharaOverview derived={derived} dashboardInsight={dashboardInsight} setActive={setActive} navigate={navigate} />
     }
     if (active === 'tx-all') return <ManajemenManagemenTransaksi {...transactionProps} />
     if (active === 'tx-in') return <BendaharaPemasukan {...transactionProps} />
@@ -276,7 +303,7 @@ export default function BendaharaDashboard({ navigate }) {
   }
 
   return (
-    <div className="min-h-screen bg-[#eff1f6] flex">
+    <div className="min-h-screen bg-gray-50 flex font-sans">
       <BendaharaSidebar
         navigate={navigate}
         active={active}
@@ -308,6 +335,13 @@ export default function BendaharaDashboard({ navigate }) {
           isSaving={isSaving}
           closeModal={closeModal}
           submitTx={submitTx}
+        />
+      )}
+
+      {previewTx && (
+        <ReceiptPreviewModal
+          transaction={previewTx}
+          onClose={() => setPreviewTx(null)}
         />
       )}
     </div>

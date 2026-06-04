@@ -68,6 +68,11 @@ export function sanitizeTransaction(payload = {}) {
     category: String(payload.category || '').trim(),
     status: String(payload.status || 'Lunas').trim(),
     amount: type === 'Pengeluaran' ? -amountAbs : amountAbs,
+    source: payload.source || 'manual',
+    receipt_image: payload.receipt_image || null,
+    validation_confidence: payload.validation_confidence || null,
+    items: payload.items || null,
+    ocr_raw_result: payload.ocr_raw_result || null
   }
 }
 

@@ -3,6 +3,7 @@
 // sama persis dengan pgStore.
 
 import { getCollection, loadDb, nextId, saveDb, setCollection } from '../lib/db.js'
+import { sanitizeTransaction } from '../lib/normalize.js'
 
 export async function init() {
   loadDb()
@@ -116,20 +117,28 @@ export async function touchLastLogin(id, time) {
 
 /* ------------------------------ Keuangan ----------------------------- */
 export async function listTransactions() {
-  return [...getCollection('transactions')]
+  return getCollection('transactions').map((item) => ({ ...item, ...sanitizeTransaction(item), id: Number(item.id) }))
 }
 export async function createTransaction(data) {
   const tx = getCollection('transactions')
-  const item = { id: nextId(tx), ...data }
+  const item = { id: nextId(tx), ...sanitizeTransaction(data) }
   tx.unshift(item)
   saveDb()
   return item
+}
+export async function createTransactions(transactions) {
+  const tx = getCollection('transactions')
+  let maxId = nextId(tx) - 1
+  const newItems = transactions.map(data => ({ id: ++maxId, ...sanitizeTransaction(data) }))
+  tx.unshift(...newItems)
+  saveDb()
+  return newItems
 }
 export async function updateTransaction(id, data) {
   const tx = getCollection('transactions')
   const i = tx.findIndex((t) => t.id === Number(id))
   if (i === -1) return null
-  tx[i] = { ...tx[i], ...data, id: Number(id) }
+  tx[i] = { ...tx[i], ...sanitizeTransaction(data), id: Number(id) }
   saveDb()
   return tx[i]
 }
@@ -158,6 +167,152 @@ export async function removeCategory(type, name) {
   categories[key] = (categories[key] || []).filter((item) => item !== name)
   saveDb()
   return categories
+}
+
+/* --------------------------- Import Batch ---------------------------- */
+function normalizeImportBatch(item) {
+  return {
+    id: Number(item.id),
+    sourceType: String(item.sourceType || 'excel'),
+    fileName: String(item.fileName || '').trim(),
+    originalName: String(item.originalName || '').trim(),
+    status: String(item.status || 'draft'),
+    totalRows: Number(item.totalRows) || 0,
+    validRows: Number(item.validRows) || 0,
+    invalidRows: Number(item.invalidRows) || 0,
+    previewReady: Boolean(item.previewReady),
+    confirmedAt: item.confirmedAt || null,
+    createdAt: item.createdAt || new Date().toISOString(),
+    updatedAt: item.updatedAt || new Date().toISOString(),
+  }
+}
+
+function normalizeImportRecord(item) {
+  return {
+    id: Number(item.id),
+    batchId: Number(item.batchId),
+    rowIndex: Number(item.rowIndex) || 0,
+    rawData: item.rawData || {},
+    normalizedData: item.normalizedData || {},
+    validationErrors: Array.isArray(item.validationErrors) ? item.validationErrors : [],
+    status: String(item.status || 'pending'),
+    createdAt: item.createdAt || new Date().toISOString(),
+    updatedAt: item.updatedAt || new Date().toISOString(),
+  }
+}
+
+export async function listImportBatches() {
+  return [...getCollection('importBatches')].map(normalizeImportBatch)
+}
+
+export async function getImportBatch(id) {
+  return getCollection('importBatches').find((batch) => batch.id === Number(id)) ?? null
+}
+
+export async function createImportBatch(data) {
+  const batches = getCollection('importBatches')
+  const now = new Date().toISOString()
+  const item = normalizeImportBatch({
+    id: nextId(batches),
+    sourceType: data.sourceType,
+    fileName: data.fileName,
+    originalName: data.originalName,
+    status: data.status,
+    totalRows: data.totalRows,
+    validRows: data.validRows,
+    invalidRows: data.invalidRows,
+    previewReady: data.previewReady,
+    confirmedAt: data.confirmedAt,
+    createdAt: now,
+    updatedAt: now,
+  })
+  batches.unshift(item)
+  saveDb()
+  return item
+}
+
+export async function updateImportBatch(id, patch) {
+  const batches = getCollection('importBatches')
+  const index = batches.findIndex((batch) => batch.id === Number(id))
+  if (index === -1) return null
+  const merged = normalizeImportBatch({ ...batches[index], ...patch, id: Number(id), updatedAt: new Date().toISOString() })
+  batches[index] = merged
+  saveDb()
+  return merged
+}
+
+export async function deleteImportBatch(id) {
+  const batches = getCollection('importBatches')
+  const index = batches.findIndex((batch) => batch.id === Number(id))
+  if (index === -1) return false
+  batches.splice(index, 1)
+  const records = getCollection('importRecords').filter((record) => record.batchId !== Number(id))
+  setCollection('importRecords', records)
+  saveDb()
+  return true
+}
+
+export async function listImportRecords(batchId) {
+  return getCollection('importRecords')
+    .filter((record) => record.batchId === Number(batchId))
+    .map(normalizeImportRecord)
+}
+
+export async function createImportRecord(data) {
+  const records = getCollection('importRecords')
+  const now = new Date().toISOString()
+  const item = normalizeImportRecord({
+    id: nextId(records),
+    batchId: data.batchId,
+    rowIndex: data.rowIndex,
+    rawData: data.rawData,
+    normalizedData: data.normalizedData,
+    validationErrors: data.validationErrors,
+    status: data.status,
+    createdAt: now,
+    updatedAt: now,
+  })
+  records.push(item)
+  saveDb()
+  return item
+}
+export async function createImportRecords(recordsArray) {
+  const records = getCollection('importRecords')
+  const now = new Date().toISOString()
+  let maxId = nextId(records) - 1
+  const newItems = recordsArray.map(data => normalizeImportRecord({
+    id: ++maxId,
+    batchId: data.batchId,
+    rowIndex: data.rowIndex,
+    rawData: data.rawData,
+    normalizedData: data.normalizedData,
+    validationErrors: data.validationErrors,
+    status: data.status,
+    createdAt: now,
+    updatedAt: now,
+  }))
+  records.push(...newItems)
+  saveDb()
+  return newItems
+}
+
+export async function updateImportRecord(id, patch) {
+  const records = getCollection('importRecords')
+  const index = records.findIndex((record) => record.id === Number(id))
+  if (index === -1) return null
+  const merged = normalizeImportRecord({ ...records[index], ...patch, id: Number(id), updatedAt: new Date().toISOString() })
+  records[index] = merged
+  saveDb()
+  return merged
+}
+
+export async function deleteImportRecord(id) {
+  const records = getCollection('importRecords')
+  const index = records.findIndex((record) => record.id === Number(id))
+  if (index === -1) return false
+  records.splice(index, 1)
+  saveDb()
+  return true
 }
 
 /* ----------------------------- Struktur ------------------------------ */

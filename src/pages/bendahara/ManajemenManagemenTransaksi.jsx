@@ -14,6 +14,7 @@ export default function ManajemenManagemenTransaksi({
   openCreate,
   openEdit,
   deleteTx,
+  openPreview,
 }) {
   return (
     <div className="space-y-6">
@@ -67,13 +68,25 @@ export default function ManajemenManagemenTransaksi({
                   <td className="px-5 py-4 text-[#556987]">{item.date}</td>
                   <td className="px-5 py-4 text-[#111827] font-medium">{item.type}</td>
                   <td className="px-5 py-4 text-[#556987]">{item.category}</td>
-                  <td className="px-5 py-4 text-[#111827]">{item.desc}</td>
+                  <td className="px-5 py-4 text-[#111827]">
+                    {item.desc}
+                    {item.source === 'ocr' && (
+                      <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-indigo-100 text-indigo-800">
+                        🤖 AI Scanned
+                      </span>
+                    )}
+                  </td>
                   <td className="px-5 py-4 text-[#556987]">{item.status}</td>
                   <td className={`px-5 py-4 font-bold ${item.amount > 0 ? 'text-emerald-700' : 'text-amber-700'}`}>
                     {item.amount > 0 ? '+' : '-'} {formatRupiah(item.amount)}
                   </td>
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-3">
+                      {item.receipt_image && (
+                        <button onClick={() => openPreview(item)} className="text-indigo-600 hover:text-indigo-800 bg-transparent border-0 cursor-pointer text-xs font-semibold">
+                          📸 Lihat Bukti
+                        </button>
+                      )}
                       <button onClick={() => openEdit(item)} className="text-[#6e8098] hover:text-[#0f4a8a] bg-transparent border-0 cursor-pointer">Edit</button>
                       <button onClick={() => deleteTx(item.id)} className="text-[#6e8098] hover:text-red-600 bg-transparent border-0 cursor-pointer">Hapus</button>
                     </div>

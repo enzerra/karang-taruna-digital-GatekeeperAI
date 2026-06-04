@@ -92,3 +92,12 @@ export async function removeCategory(type, name) {
   return next
 }
 
+export async function generateAiReport(payload) {
+  if (USE_BACKEND_API) {
+    return requestJson('/api/finance/ai-report', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    })
+  }
+  throw new Error("API backend diperlukan untuk fitur Laporan AI")
+}

@@ -3,19 +3,53 @@ import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
 import { PROGRAMS } from '../../mocks/portalData'
 import { listNews } from '../../services/news/newsService'
+import { listTransactions } from '../../services/finance/financeService'
 
 export default function HomePage({ navigate }) {
   const [news, setNews] = useState([])
+  const [finance, setFinance] = useState({ saldo: 0, pemasukanBulanIni: 0, pengeluaranBulanIni: 0, recentTxs: [] })
+  
   const BADGE_STYLE = {
     AKTIF: { bg: '#dcfce7', color: '#166534' },
     MENDATANG: { bg: '#fef3c7', color: '#92400e' },
     SELESAI: { bg: '#e5e7eb', color: '#374151' },
   }
 
+  const formatRupiah = (num) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(num || 0)
+
   useEffect(() => {
     const load = async () => {
       const data = await listNews()
       setNews(data)
+      
+      try {
+        const txs = await listTransactions()
+        const currentMonth = new Date().getMonth()
+        const currentYear = new Date().getFullYear()
+        
+        let totalSaldo = 0
+        let inBulanIni = 0
+        let outBulanIni = 0
+        
+        txs.forEach(tx => {
+          totalSaldo += tx.amount
+          const d = new Date(tx.date)
+          if (d.getMonth() === currentMonth && d.getFullYear() === currentYear) {
+            if (tx.amount > 0) inBulanIni += tx.amount
+            if (tx.amount < 0) outBulanIni += Math.abs(tx.amount)
+          }
+        })
+        
+        const sorted = [...txs].sort((a,b) => new Date(b.date) - new Date(a.date))
+        setFinance({ 
+          saldo: totalSaldo, 
+          pemasukanBulanIni: inBulanIni, 
+          pengeluaranBulanIni: outBulanIni,
+          recentTxs: sorted.slice(0, 5)
+        })
+      } catch (err) {
+        console.error("Gagal memuat transparansi", err)
+      }
     }
     load()
   }, [])
@@ -78,6 +112,78 @@ export default function HomePage({ navigate }) {
                 <div className="text-xl font-bold text-gray-900">12+</div>
                 <div className="text-xs text-gray-500">Program Aktif</div>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* PORTAL TRANSPARANSI */}
+      <section className="py-12 px-6 bg-[#1a3a6b]">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-10">
+            <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">Portal Transparansi Dana</h2>
+            <p className="text-blue-200 max-w-xl mx-auto text-sm">
+              Laporan ringkas arus kas Karang Taruna bulan ini. Wujud nyata komitmen kami terhadap akuntabilitas warga.
+            </p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6 text-center shadow-lg">
+              <div className="w-12 h-12 mx-auto bg-green-500/20 text-green-300 rounded-full flex items-center justify-center mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 11l5-5m0 0l5 5m-5-5v12" /></svg>
+              </div>
+              <h3 className="text-blue-100 text-sm font-medium mb-1">Pemasukan Bulan Ini</h3>
+              <div className="text-white text-2xl font-bold">{formatRupiah(finance.pemasukanBulanIni)}</div>
+            </div>
+            
+            <div className="bg-white rounded-2xl p-6 text-center shadow-xl transform md:-translate-y-4 border border-blue-100">
+              <div className="w-14 h-14 mx-auto bg-blue-100 text-[#1a3a6b] rounded-full flex items-center justify-center mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" /></svg>
+              </div>
+              <h3 className="text-gray-500 text-sm font-bold uppercase tracking-wider mb-2">Total Kas Aktif</h3>
+              <div className="text-[#1a3a6b] text-3xl font-black">{formatRupiah(finance.saldo)}</div>
+              <p className="text-xs text-green-600 font-semibold mt-2 flex items-center justify-center gap-1">
+                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                Data Tersinkronisasi
+              </p>
+            </div>
+            
+            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6 text-center shadow-lg">
+              <div className="w-12 h-12 mx-auto bg-red-500/20 text-red-300 rounded-full flex items-center justify-center mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 13l-5 5m0 0l-5-5m5 5V6" /></svg>
+              </div>
+              <h3 className="text-blue-100 text-sm font-medium mb-1">Pengeluaran Bulan Ini</h3>
+              <div className="text-white text-2xl font-bold">{formatRupiah(finance.pengeluaranBulanIni)}</div>
+            </div>
+          </div>
+          
+          <div className="mt-10 bg-white rounded-2xl p-6 shadow-xl max-w-4xl mx-auto border border-blue-100">
+            <h3 className="text-[#1a3a6b] font-bold text-lg mb-4 flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
+              Log Transaksi Terakhir
+            </h3>
+            <div className="space-y-3">
+              {finance.recentTxs.length > 0 ? finance.recentTxs.map((tx, idx) => (
+                <div key={idx} className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-xl transition-colors border border-gray-100">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${tx.amount > 0 ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
+                      {tx.amount > 0 ? (
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+                      ) : (
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" /></svg>
+                      )}
+                    </div>
+                    <div>
+                      <p className="font-semibold text-gray-900 text-sm m-0 leading-tight">{tx.desc || 'Transaksi'}</p>
+                      <p className="text-xs text-gray-500 m-0 mt-1">{new Date(tx.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })} • {tx.category || 'Umum'}</p>
+                    </div>
+                  </div>
+                  <div className={`font-bold text-sm ${tx.amount > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    {tx.amount > 0 ? '+' : '-'}{formatRupiah(Math.abs(tx.amount))}
+                  </div>
+                </div>
+              )) : (
+                <p className="text-center text-sm text-gray-400 py-4">Belum ada data transaksi</p>
+              )}
             </div>
           </div>
         </div>

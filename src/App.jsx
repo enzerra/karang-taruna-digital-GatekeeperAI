@@ -10,7 +10,9 @@ import AdminDashboard from './pages/admin/AdminDashboard'
 import AdminBerita from './pages/admin/AdminBerita'
 import AdminUsers from './pages/admin/AdminUsers'
 import AdminProgram from './pages/admin/AdminProgram'
+import MasterDataPage from './pages/admin/MasterDataPage'
 import BendaharaDashboard from './pages/bendahara/BendaharaDashboard'
+import ImportDataPage from './pages/bendahara/ImportDataPage'
 
 export default function App() {
   const [page, setPage] = useState('home')
@@ -34,7 +36,9 @@ export default function App() {
     'admin-berita': <AdminBerita navigate={navigate} />,
     'admin-users': <AdminUsers navigate={navigate} />,
     'admin-program': <AdminProgram navigate={navigate} />,
+    'admin-master-data': <MasterDataPage navigate={navigate} />,
     'bendahara': <BendaharaDashboard navigate={navigate} />,
+    'import-data': <ImportDataPage navigate={navigate} />,
   }
 
   return (

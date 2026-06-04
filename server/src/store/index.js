@@ -7,12 +7,19 @@
 
 import * as jsonStore from './jsonStore.js'
 import * as pgStore from './pgStore.js'
+import * as supabaseStore from './supabaseStore.js'
 
 const driver = (process.env.DB_DRIVER || 'json').toLowerCase()
-const usePostgres = driver === 'postgres' || driver === 'pg'
 
-export const DB_DRIVER = usePostgres ? 'postgres' : 'json'
+export const DB_DRIVER = driver
 
-const store = usePostgres ? pgStore : jsonStore
+let store
+if (driver === 'supabase') {
+  store = supabaseStore
+} else if (driver === 'postgres' || driver === 'pg') {
+  store = pgStore
+} else {
+  store = jsonStore
+}
 
 export default store

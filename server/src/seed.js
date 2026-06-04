@@ -24,14 +24,11 @@ export const seedData = {
     { id: 3, name: 'Nadia Putri', email: 'anggota@karangtaruna.id', role: 'anggota', status: 'Aktif', lastLogin: '30 Apr 2024, 20:10', password: 'anggota123' },
   ],
 
-  transactions: [
-    { id: 1, date: '2024-04-30', type: 'Pemasukan', desc: 'Iuran anggota bulanan', category: 'Kas bulanan', status: 'Lunas', amount: 3250000 },
-    { id: 2, date: '2024-04-29', type: 'Pengeluaran', desc: 'Operasional sekretariat', category: 'Peralatan', status: 'Lunas', amount: -850000 },
-    { id: 3, date: '2024-04-27', type: 'Pengeluaran', desc: 'Dukungan kegiatan sosial', category: 'Event', status: 'Lunas', amount: -1200000 },
-    { id: 4, date: '2024-04-25', type: 'Pemasukan', desc: 'Donasi mitra UMKM', category: 'Donasi', status: 'Lunas', amount: 2000000 },
-    { id: 5, date: '2024-04-20', type: 'Pemasukan', desc: 'Hasil festival UMKM', category: 'Donasi', status: 'Lunas', amount: 5500000 },
-    { id: 6, date: '2024-04-18', type: 'Pengeluaran', desc: 'Perlengkapan kegiatan', category: 'Peralatan', status: 'Lunas', amount: -750000 },
-  ],
+  transactions: [],
+
+  importBatches: [],
+
+  importRecords: [],
 
   categories: {
     pemasukan: ['Kas bulanan', 'Wifi', 'Donasi'],

@@ -7,6 +7,8 @@
 BEGIN;
 
 DROP TABLE IF EXISTS transactions CASCADE;
+DROP TABLE IF EXISTS import_records CASCADE;
+DROP TABLE IF EXISTS import_batches CASCADE;
 DROP TABLE IF EXISTS finance_categories CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
 DROP TABLE IF EXISTS programs CASCADE;
@@ -57,6 +59,41 @@ CREATE TABLE finance_categories (
   UNIQUE (type, name)
 );
 
+-- ------------------------------------------------------------- Import batch
+CREATE TABLE import_batches (
+  id             SERIAL PRIMARY KEY,
+  source_type    TEXT NOT NULL DEFAULT 'excel',
+  file_name      TEXT NOT NULL,
+  original_name  TEXT NOT NULL,
+  status         TEXT NOT NULL DEFAULT 'draft',
+  total_rows     INTEGER NOT NULL DEFAULT 0,
+  valid_rows     INTEGER NOT NULL DEFAULT 0,
+  invalid_rows   INTEGER NOT NULL DEFAULT 0,
+  preview_ready  BOOLEAN NOT NULL DEFAULT FALSE,
+  confirmed_at   TIMESTAMPTZ,
+  created_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at     TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_import_batches_status ON import_batches (status);
+
+-- ---------------------------------------------------------- Import records
+CREATE TABLE import_records (
+  id                SERIAL PRIMARY KEY,
+  batch_id          INTEGER NOT NULL REFERENCES import_batches(id) ON DELETE CASCADE,
+  row_index         INTEGER NOT NULL,
+  raw_data          JSONB NOT NULL DEFAULT '{}'::jsonb,
+  normalized_data   JSONB NOT NULL DEFAULT '{}'::jsonb,
+  validation_errors JSONB NOT NULL DEFAULT '[]'::jsonb,
+  status            TEXT NOT NULL DEFAULT 'pending',
+  created_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE (batch_id, row_index)
+);
+
+CREATE INDEX idx_import_records_batch_id ON import_records (batch_id);
+CREATE INDEX idx_import_records_status ON import_records (status);
+
 -- ------------------------------------------------------------- Transaksi kas
 CREATE TABLE transactions (
   id        SERIAL PRIMARY KEY,
@@ -66,7 +103,14 @@ CREATE TABLE transactions (
   category  TEXT NOT NULL DEFAULT '',
   status    TEXT NOT NULL DEFAULT 'Lunas',
   -- amount disimpan BERTANDA: negatif untuk pengeluaran.
-  amount    BIGINT NOT NULL DEFAULT 0
+  amount                  BIGINT NOT NULL DEFAULT 0,
+  
+  -- Audit Trail OCR
+  source                  TEXT NOT NULL DEFAULT 'manual',
+  receipt_image           TEXT,
+  validation_confidence   TEXT,
+  items                   JSONB,
+  ocr_raw_result          JSONB
 );
 
 -- ------------------------------------------------------ Struktur organisasi

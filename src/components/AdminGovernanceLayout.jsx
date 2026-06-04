@@ -5,6 +5,7 @@ function SidebarIcon({ name }) {
     berita: <path d="M4 5h16v14H4zM8 9h8M8 13h8M8 17h5" />,
     program: <path d="M7 3v3M17 3v3M4 8h16M5 5h14a1 1 0 011 1v13a1 1 0 01-1 1H5a1 1 0 01-1-1V6a1 1 0 011-1z" />,
     keuangan: <path d="M4 7h16v10H4zM4 10h16M8 14h2" />,
+    'master-data': <path d="M5 4h14a2 2 0 012 2v12a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2zm0 5v2m14-2v2M5 14v2m14-2v2M9 4v16m6-16v16" />,
     users: <path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zm13 10v-2a4 4 0 00-3-3.87" />,
     pengaturan: <path d="M12 8a4 4 0 100 8 4 4 0 000-8zm8 4l-2.1.7a7.7 7.7 0 01-.4 1l1.2 1.9-1.4 1.4-1.9-1.2a7.7 7.7 0 01-1 .4L14 20h-4l-.7-2.1a7.7 7.7 0 01-1-.4l-1.9 1.2-1.4-1.4 1.2-1.9a7.7 7.7 0 01-.4-1L4 12l2.1-.7a7.7 7.7 0 01.4-1L5.3 8.4 6.7 7l1.9 1.2a7.7 7.7 0 011-.4L10 5h4l.7 2.1a7.7 7.7 0 011 .4L17.3 6.3 18.7 7l-1.2 1.9c.16.32.29.66.4 1L20 12z" />,
   }
@@ -21,6 +22,7 @@ const SIDEBAR_ITEMS = [
   { id: 'berita', label: 'Berita', page: 'admin-berita' },
   { id: 'program', label: 'Program Kerja', page: 'admin-program' },
   { id: 'keuangan', label: 'Keuangan', page: 'bendahara' },
+  { id: 'master-data', label: 'Master Data', page: 'admin-master-data' },
   { id: 'users', label: 'User/Role', page: 'admin-users' },
 ]
 

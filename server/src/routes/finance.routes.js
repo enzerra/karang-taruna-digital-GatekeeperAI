@@ -58,4 +58,9 @@ router.delete('/categories', asyncHandler(async (req, res, next) => {
   res.json(await store.removeCategory(key, name))
 }))
 
+/* --------------------------- Laporan AI ----------------------------- */
+
+import { generateAiReport } from '../controllers/report.controller.js'
+router.post('/ai-report', generateAiReport)
+
 export default router

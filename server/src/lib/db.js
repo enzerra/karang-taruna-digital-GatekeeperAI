@@ -48,6 +48,11 @@ export function loadDb() {
 // Mengembalikan koleksi tertentu (referensi langsung ke memori).
 export function getCollection(name) {
   const data = loadDb()
+  if (data[name] === undefined) {
+    // ensure collections always exist to avoid reducer/undefined errors
+    data[name] = []
+    persist()
+  }
   return data[name]
 }
 
