@@ -147,8 +147,8 @@ export async function scanBukuKas(req, res, next) {
     const form = new FormData();
     form.append('file', blob, file.originalname);
 
-    const FASTAPI_URL = process.env.FASTAPI_URL || 'http://127.0.0.1:8000';
-    const response = await fetch(`${FASTAPI_URL}/scan-halaman`, {
+    const GATEKEEPER_URL = process.env.GATEKEEPER_URL || 'http://127.0.0.1:8000';
+    const response = await fetch(`${GATEKEEPER_URL}/scan-halaman`, {
       method: 'POST',
       body: form
     });
