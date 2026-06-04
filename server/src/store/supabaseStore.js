@@ -1,9 +1,12 @@
 import { createClient } from '@supabase/supabase-js'
+import ws from 'ws'
 import { sanitizeTransaction } from '../lib/normalize.js'
 
 const supabaseUrl = process.env.SUPABASE_URL || 'http://localhost'
 const supabaseKey = process.env.SUPABASE_SERVICE_KEY || 'dummy'
-export const supabase = createClient(supabaseUrl, supabaseKey)
+export const supabase = createClient(supabaseUrl, supabaseKey, {
+  realtime: { transport: ws }
+})
 
 export async function init() {
   if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_KEY) {
