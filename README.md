@@ -1,16 +1,41 @@
-# React + Vite
+# SIKARTA - Frontend (Antarmuka Pengguna)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Ini adalah repositori **Frontend** untuk proyek SIKARTA (Sistem Informasi Karang Taruna). Dibangun menggunakan teknologi antarmuka web modern yang sangat cepat dan responsif.
 
-Currently, two official plugins are available:
+## 🚀 Teknologi yang Digunakan
+- **Framework:** React.js
+- **Build Tool:** Vite
+- **Styling:** Tailwind CSS
+- **Deployment:** Vercel
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## ⚙️ Persyaratan Sistem
+- Node.js (Minimal v18+)
+- npm atau yarn
 
-## React Compiler
+## 🛠️ Cara Menjalankan di Komputer Lokal
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+1. **Install Dependensi**
+   Buka terminal di dalam folder ini dan jalankan:
+   ```bash
+   npm install
+   ```
 
-## Expanding the ESLint configuration
+2. **Konfigurasi Environment**
+   Buat salinan dari file `.env.example` dan ubah namanya menjadi `.env.local` atau `.env`.
+   Pastikan URL mengarah ke server backend Anda:
+   ```env
+   VITE_API_BASE_URL=http://localhost:4000
+   ```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+3. **Jalankan Development Server**
+   ```bash
+   npm run dev
+   ```
+   Aplikasi akan berjalan secara lokal, biasanya di `http://localhost:5173`.
+
+## 📦 Build untuk Produksi
+Untuk melakukan kompilasi file yang siap di-*deploy*:
+```bash
+npm run build
+```
+Folder `dist` akan terbuat dan siap untuk dipublikasikan ke layanan hosting statis (Vercel, Netlify, dll).
